@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.8"
+VERSION = "0.3.9"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -391,9 +391,20 @@ def run_updater():
                                     updated = True
 
                     if updated:
+                        # Ensure desktop shortcut exists after update
+                        ensure_desktop_shortcut(install_dir)
+
                         print()
-                        print(f"{Colors.GREEN}Updated to version {remote_version}!{Colors.END}")
-                        print("\nPlease restart the application to use the new version.")
+                        print("=" * 50)
+                        print(f"{Colors.GREEN}  UPDATE SUCCESSFUL!{Colors.END}")
+                        print("=" * 50)
+                        print(f"\n  Updated to version {remote_version}")
+                        print(f"\n  Installation: {install_dir}")
+                        print("\n  Next steps:")
+                        print("    1. Close this window")
+                        print("    2. Re-open the installer to see new version")
+                        print("    3. Or use the desktop shortcut to launch the UI")
+                        print()
                     else:
                         print_warning("No existing installation found.")
                         print("Please run the full installation instead.")
@@ -636,18 +647,22 @@ def add_to_path(install_dir):
         print_warning(f"Could not update PATH: {e}")
 
 
-def create_desktop_shortcut(install_dir):
-    """Create desktop shortcut."""
-    if not prompt("Create desktop shortcut?"):
-        return
+def create_desktop_shortcut_impl(install_dir, silent=False):
+    """Create desktop shortcut (implementation).
 
+    Args:
+        install_dir: Installation directory
+        silent: If True, don't print success messages (for updates)
+
+    Returns:
+        True if shortcut was created, False otherwise
+    """
     desktop = Path.home() / "Desktop"
     if not desktop.exists():
         desktop = Path.home()
 
     if IS_WINDOWS:
         try:
-            import winreg
             # Use PowerShell to create shortcut
             shortcut_path = desktop / "Resolve Production Suite.lnk"
             target = install_dir / "resolve-suite-ui.bat"
@@ -660,13 +675,40 @@ $s.Description = "Resolve Production Suite"
 $s.Save()
 '''
             subprocess.run(["powershell", "-Command", ps_cmd], check=True, capture_output=True)
-            print_success(f"Created desktop shortcut")
+            if not silent:
+                print_success("Created desktop shortcut")
+            return True
         except Exception as e:
-            print_warning(f"Could not create shortcut: {e}")
+            if not silent:
+                print_warning(f"Could not create shortcut: {e}")
+            return False
+
+    elif IS_MACOS:
+        try:
+            # Create macOS alias/shortcut using AppleScript
+            shortcut_path = desktop / "Resolve Production Suite"
+            target = install_dir / "resolve-suite-ui"
+
+            # Create a simple shell script wrapper that users can double-click
+            shortcut_path.write_text(f"""#!/bin/bash
+# Resolve Production Suite Launcher
+cd "{install_dir}"
+./resolve-suite-ui
+""")
+            shortcut_path.chmod(0o755)
+
+            if not silent:
+                print_success("Created desktop shortcut")
+            return True
+        except Exception as e:
+            if not silent:
+                print_warning(f"Could not create shortcut: {e}")
+            return False
 
     elif IS_LINUX:
-        shortcut = desktop / "resolve-production-suite.desktop"
-        shortcut.write_text(f"""[Desktop Entry]
+        try:
+            shortcut = desktop / "resolve-production-suite.desktop"
+            shortcut.write_text(f"""[Desktop Entry]
 Version=1.0
 Type=Application
 Name=Resolve Production Suite
@@ -674,8 +716,45 @@ Exec={install_dir}/resolve-suite-ui
 Terminal=false
 Categories=AudioVideo;Video;
 """)
-        shortcut.chmod(0o755)
-        print_success("Created desktop shortcut")
+            shortcut.chmod(0o755)
+            if not silent:
+                print_success("Created desktop shortcut")
+            return True
+        except Exception as e:
+            if not silent:
+                print_warning(f"Could not create shortcut: {e}")
+            return False
+
+    return False
+
+
+def create_desktop_shortcut(install_dir):
+    """Create desktop shortcut (with user prompt)."""
+    if not prompt("Create desktop shortcut?"):
+        return
+    create_desktop_shortcut_impl(install_dir, silent=False)
+
+
+def ensure_desktop_shortcut(install_dir):
+    """Ensure desktop shortcut exists (creates if missing, silent)."""
+    desktop = Path.home() / "Desktop"
+    if not desktop.exists():
+        return
+
+    # Check if shortcut already exists
+    if IS_WINDOWS:
+        shortcut_path = desktop / "Resolve Production Suite.lnk"
+    elif IS_MACOS:
+        shortcut_path = desktop / "Resolve Production Suite"
+    elif IS_LINUX:
+        shortcut_path = desktop / "resolve-production-suite.desktop"
+    else:
+        return
+
+    if not shortcut_path.exists():
+        print_step("Creating desktop shortcut...")
+        if create_desktop_shortcut_impl(install_dir, silent=True):
+            print_success("Desktop shortcut created")
 
 
 # =============================================================================
@@ -733,21 +812,36 @@ def run_installation():
 
         # Success
         print_header()
-        print(f"{Colors.GREEN}INSTALLATION COMPLETE!{Colors.END}\n")
-        print("Quick Start:")
-        print(f"  1. Open a new terminal")
-        print(f"  2. Navigate to: {install_dir}")
-        if IS_WINDOWS:
-            print(f"  3. Run: resolve-suite.bat list")
-            if install_ui:
-                print(f"  4. Or launch: resolve-suite-ui.bat")
-        else:
-            print(f"  3. Run: ./resolve-suite list")
-            if install_ui:
-                print(f"  4. Or launch: ./resolve-suite-ui")
+        print("=" * 50)
+        print(f"{Colors.GREEN}  INSTALLATION COMPLETE!{Colors.END}")
+        print("=" * 50)
         print()
-        print(f"Documentation: {install_dir / 'docs'}")
-        print(f"Reports saved to: {get_data_dir() / 'reports'}")
+        print("  You're all set! Here's how to get started:")
+        print()
+        if install_ui:
+            print(f"  {Colors.CYAN}EASIEST WAY:{Colors.END}")
+            print("    Double-click the 'Resolve Production Suite' shortcut on your Desktop")
+            print()
+        print(f"  {Colors.CYAN}COMMAND LINE:{Colors.END}")
+        if IS_WINDOWS:
+            print(f"    1. Open Command Prompt or PowerShell")
+            print(f"    2. cd {install_dir}")
+            print(f"    3. resolve-suite.bat list")
+        else:
+            print(f"    1. Open Terminal")
+            print(f"    2. cd {install_dir}")
+            print(f"    3. ./resolve-suite list")
+        print()
+        print(f"  {Colors.CYAN}THE 10 TOOLS:{Colors.END}")
+        print("    1. Revision Resolver      6. Timeline Normalizer")
+        print("    2. Relink Across Projects 7. Component Graphics")
+        print("    3. Smart Reframer         8. Delivery Spec Enforcer")
+        print("    4. Caption Layout         9. Change Impact Analyzer")
+        print("    5. Feedback Compiler     10. Brand Drift Detector")
+        print()
+        print(f"  Documentation: {install_dir / 'docs'}")
+        print(f"  Reports saved to: {get_data_dir() / 'reports'}")
+        print()
 
     except Exception as e:
         print_error(f"Installation failed: {e}")
@@ -852,6 +946,15 @@ def run_uninstall():
     wait_for_key()
 
 
+def is_installed():
+    """Check if the suite is already installed."""
+    if IS_WINDOWS:
+        install_dir = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "ResolveProductionSuite"
+    else:
+        install_dir = Path.home() / ".local" / "share" / "resolve-production-suite"
+    return install_dir.exists()
+
+
 def main():
     """Main entry point with menu."""
     print_header()
@@ -864,6 +967,8 @@ def main():
         sys.exit(1)
 
     print_success(f"Python {sys.version_info.major}.{sys.version_info.minor} detected")
+
+    already_installed = is_installed()
 
     print("""
     RESOLVE PRODUCTION SUITE
@@ -879,10 +984,16 @@ def main():
 
     while True:
         print("\nWhat would you like to do?\n")
-        print("  1. Install Resolve Production Suite")
-        print("  2. Check for Updates")
-        print("  3. Uninstall")
-        print("  4. Exit")
+        if already_installed:
+            print("  1. Reinstall / Repair")
+            print("  2. Check for Updates")
+            print("  3. Uninstall")
+            print("  4. Exit")
+        else:
+            print("  1. Install (First Time Setup)")
+            print("  2. Check for Updates")
+            print("  3. Uninstall")
+            print("  4. Exit")
         print()
 
         try:
