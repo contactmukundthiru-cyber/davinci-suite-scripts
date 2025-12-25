@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.6"
+VERSION = "0.3.7"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -255,16 +255,11 @@ def download_file(url, dest_path, desc="Downloading"):
         return False
 
 
-def apply_update(zip_path, install_dir):
+def apply_update(zip_path, install_dir, is_current_dir=False):
     """Extract and apply update from zip file."""
     print_step("Applying update...")
 
     try:
-        # Create backup of current installation
-        backup_dir = install_dir.parent / f"{install_dir.name}_backup"
-        if backup_dir.exists():
-            shutil.rmtree(backup_dir)
-
         # Extract to temp location first
         temp_extract = Path(tempfile.mkdtemp())
         with zipfile.ZipFile(zip_path, 'r') as zf:
@@ -276,32 +271,60 @@ def apply_update(zip_path, install_dir):
         if len(subdirs) == 1 and subdirs[0].is_dir():
             content_dir = subdirs[0]
 
-        # Backup current installation
-        if install_dir.exists():
-            shutil.move(str(install_dir), str(backup_dir))
+        if is_current_dir:
+            # For current directory, copy files individually (avoids locking issues)
+            # Skip .venv and other runtime files
+            skip_dirs = {'.venv', '__pycache__', '.git'}
+            skip_files = set()
 
-        # Copy new files
-        shutil.copytree(content_dir, install_dir)
+            for item in content_dir.iterdir():
+                if item.name in skip_dirs:
+                    continue
 
-        # Restore venv if it existed
-        venv_backup = backup_dir / ".venv"
-        if venv_backup.exists():
-            shutil.move(str(venv_backup), str(install_dir / ".venv"))
+                dest = install_dir / item.name
+                try:
+                    if item.is_dir():
+                        if dest.exists():
+                            shutil.rmtree(dest)
+                        shutil.copytree(item, dest)
+                    else:
+                        shutil.copy2(item, dest)
+                except PermissionError:
+                    # File is in use, skip it
+                    print_warning(f"Skipped (in use): {item.name}")
+                    continue
 
-        # Clean up
+            print_success("Update applied! Please restart to see new version.")
+        else:
+            # For installed location, do full replacement
+            backup_dir = install_dir.parent / f"{install_dir.name}_backup"
+            if backup_dir.exists():
+                shutil.rmtree(backup_dir)
+
+            # Backup current installation
+            if install_dir.exists():
+                shutil.move(str(install_dir), str(backup_dir))
+
+            # Copy new files
+            shutil.copytree(content_dir, install_dir)
+
+            # Restore venv if it existed
+            venv_backup = backup_dir / ".venv"
+            if venv_backup.exists():
+                shutil.move(str(venv_backup), str(install_dir / ".venv"))
+
+            # Clean up backup
+            if backup_dir.exists():
+                shutil.rmtree(backup_dir)
+
+            print_success("Update applied successfully!")
+
+        # Clean up temp
         shutil.rmtree(temp_extract)
-        if backup_dir.exists():
-            shutil.rmtree(backup_dir)
-
-        print_success("Update applied successfully!")
         return True
 
     except Exception as e:
         print_error(f"Failed to apply update: {e}")
-        # Try to restore backup
-        if backup_dir.exists() and not install_dir.exists():
-            shutil.move(str(backup_dir), str(install_dir))
-            print_warning("Restored from backup")
         return False
 
 
@@ -352,19 +375,19 @@ def run_updater():
 
                     # Update installed location if it exists
                     if install_dir.exists():
-                        if apply_update(zip_path, install_dir):
+                        if apply_update(zip_path, install_dir, is_current_dir=False):
                             updated = True
 
                     # Also update the current folder if different from install_dir
                     # (handles case where user runs from download folder)
                     current_dir = BUNDLE_DIR
-                    if current_dir != install_dir and current_dir.exists():
+                    if current_dir.resolve() != install_dir.resolve() and current_dir.exists():
                         # Check if this looks like our package (has installer.py)
-                        if (current_dir / "installer.py").exists() or (current_dir.parent / "installer.py").exists():
+                        if (current_dir / "installer.py").exists():
                             print_step("Updating current folder...")
                             # Re-download since we already extracted once
                             if download_file(auto_url, zip_path, "Downloading for current folder"):
-                                if apply_update(zip_path, current_dir):
+                                if apply_update(zip_path, current_dir, is_current_dir=True):
                                     updated = True
 
                     if updated:
