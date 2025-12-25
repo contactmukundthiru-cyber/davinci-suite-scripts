@@ -85,7 +85,7 @@ def update_installer_version(new_version):
 def build_packages():
     """Run package_release.py to build packages."""
     print("\nBuilding packages...")
-    run(f"cd {PROJECT_DIR} && python package_release.py")
+    run(f"cd {PROJECT_DIR} && python3 package_release.py")
 
 
 def git_commit_and_tag(version, changelog):

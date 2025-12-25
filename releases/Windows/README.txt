@@ -1,4 +1,4 @@
-RESOLVE PRODUCTION SUITE v0.3.3 - WINDOWS
+RESOLVE PRODUCTION SUITE v0.3.4 - WINDOWS
 =============================================
 
 HOW TO INSTALL:

@@ -1,8 +1,8 @@
 {
-  "version": "0.3.3",
+  "version": "0.3.4",
   "release_date": "2025-12-24",
   "min_python": "3.9",
-  "changelog": "Auto-update now also updates the download folder (not just installed location)",
+  "changelog": "Updated documentation with detailed USER_GUIDE, fixed outdated instructions, removed Linux references",
   "download_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest",
   "windows_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-Windows.zip",
   "macos_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-macOS.zip",
