@@ -2,7 +2,7 @@
 
 Complete documentation for all 10 workflow automation tools.
 
-**Version:** 0.3.3
+**Version:** 0.3.8
 
 ---
 
