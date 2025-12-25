@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.2"
+VERSION = "0.3.3"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -348,11 +348,29 @@ def run_updater():
                     else:
                         install_dir = Path.home() / ".local" / "share" / "resolve-production-suite"
 
+                    updated = False
+
+                    # Update installed location if it exists
                     if install_dir.exists():
                         if apply_update(zip_path, install_dir):
-                            print()
-                            print(f"{Colors.GREEN}Updated to version {remote_version}!{Colors.END}")
-                            print("\nPlease restart the application to use the new version.")
+                            updated = True
+
+                    # Also update the current folder if different from install_dir
+                    # (handles case where user runs from download folder)
+                    current_dir = BUNDLE_DIR
+                    if current_dir != install_dir and current_dir.exists():
+                        # Check if this looks like our package (has installer.py)
+                        if (current_dir / "installer.py").exists() or (current_dir.parent / "installer.py").exists():
+                            print_step("Updating current folder...")
+                            # Re-download since we already extracted once
+                            if download_file(auto_url, zip_path, "Downloading for current folder"):
+                                if apply_update(zip_path, current_dir):
+                                    updated = True
+
+                    if updated:
+                        print()
+                        print(f"{Colors.GREEN}Updated to version {remote_version}!{Colors.END}")
+                        print("\nPlease restart the application to use the new version.")
                     else:
                         print_warning("No existing installation found.")
                         print("Please run the full installation instead.")
