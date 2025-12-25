@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["name", "version", "platforms"],
+  "properties": {
+    "name": {"type": "string"},
+    "version": {"type": "string"},
+    "platforms": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "resolution": {"type": "string"},
+          "fps": {"type": "number"},
+          "duration_limit": {"type": "number"},
+          "render_settings": {"type": "object"},
+          "naming_tokens": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}

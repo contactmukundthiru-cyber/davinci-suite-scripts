@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t5-feedback-compiler-standalone"
+version = "0.2.0"
+description = "Standalone t5_feedback_compiler tool"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Proprietary"}
+
+[project.scripts]
+t5-feedback-compiler = "run_tool:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "resolve*", "tools*"]

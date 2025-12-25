@@ -1,0 +1,11 @@
+{
+  "name": "Demo Mapping Pack",
+  "version": "1.0",
+  "root_folders": ["/mnt/media/revisions"],
+  "similarity_threshold": 0.9,
+  "aspect_tolerance": 0.05,
+  "rules": [
+    {"source": "logo_old.png", "target": "/mnt/media/revisions/logo_new.png", "strategy": "exact", "expected_resolution": "1920x1080"},
+    {"source": "_v1", "target": "/mnt/media/revisions", "strategy": "regex", "expected_aspect": 1.78}
+  ]
+}
