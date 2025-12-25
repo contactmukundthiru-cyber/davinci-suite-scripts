@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "resolve-production-suite"
+version = "0.2.0"
+description = "Resolve Production Suite - commercial-grade pipeline tools for DaVinci Resolve"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Proprietary"}
+authors = [
+  {name = "Davinci Suite"}
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: POSIX :: Linux",
+  "License :: Other/Proprietary License"
+]
+
+[project.optional-dependencies]
+ui = ["PySide6>=6.5"]
+analysis = ["opencv-python>=4.8", "numpy>=1.24"]
+video = ["ffmpeg-python>=0.2"]
+
+[project.scripts]
+resolve-suite = "cli.main:main"
+resolve-suite-ui = "ui.app:main"
+rps-t1-revision-resolver = "cli.entrypoints:t1_revision_resolver"
+rps-t2-relink-across-projects = "cli.entrypoints:t2_relink_across_projects"
+rps-t3-smart-reframer = "cli.entrypoints:t3_smart_reframer"
+rps-t4-caption-layout-protector = "cli.entrypoints:t4_caption_layout_protector"
+rps-t5-feedback-compiler = "cli.entrypoints:t5_feedback_compiler"
+rps-t6-timeline-normalizer = "cli.entrypoints:t6_timeline_normalizer"
+rps-t7-component-graphics = "cli.entrypoints:t7_component_graphics"
+rps-t8-delivery-spec-enforcer = "cli.entrypoints:t8_delivery_spec_enforcer"
+rps-t9-change-impact-analyzer = "cli.entrypoints:t9_change_impact_analyzer"
+rps-t10-brand-drift-detector = "cli.entrypoints:t10_brand_drift_detector"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "resolve*", "tools*", "cli*", "ui*", "standalone_scripts*"]

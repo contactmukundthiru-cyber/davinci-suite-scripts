@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t1-revision-resolver-standalone"
+version = "0.2.0"
+description = "Standalone t1_revision_resolver tool"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Proprietary"}
+
+[project.scripts]
+t1-revision-resolver = "run_tool:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "resolve*", "tools*"]

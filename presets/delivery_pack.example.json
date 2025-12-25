@@ -1,0 +1,17 @@
+{
+  "name": "Demo Delivery Pack",
+  "version": "1.0",
+  "platforms": {
+    "instagram_reel": {
+      "resolution": "1080x1920",
+      "fps": 30,
+      "duration_limit": 60,
+      "render_settings": {
+        "format": "mp4",
+        "codec": "H.264",
+        "quality": "Restrict to 10,000 Kb/s"
+      },
+      "naming_tokens": ["project", "platform", "version", "date"]
+    }
+  }
+}

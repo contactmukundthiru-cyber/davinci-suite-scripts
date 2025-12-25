@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["name", "version", "canonical_assets", "color_palette", "fonts", "layout_constraints", "delivery_specs"],
+  "properties": {
+    "name": {"type": "string"},
+    "version": {"type": "string"},
+    "canonical_assets": {"type": "array", "items": {"type": "string"}},
+    "color_palette": {"type": "array", "items": {"type": "string"}},
+    "fonts": {"type": "array", "items": {"type": "string"}},
+    "brand_tokens": {"type": "array", "items": {"type": "string"}},
+    "layout_constraints": {"type": "object"},
+    "delivery_specs": {"type": "object"}
+  }
+}

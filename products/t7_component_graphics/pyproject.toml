@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t7-component-graphics-standalone"
+version = "0.2.0"
+description = "Standalone t7_component_graphics tool"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Proprietary"}
+
+[project.scripts]
+t7-component-graphics = "run_tool:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "resolve*", "tools*"]

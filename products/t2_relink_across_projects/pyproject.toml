@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t2-relink-across-projects-standalone"
+version = "0.2.0"
+description = "Standalone t2_relink_across_projects tool"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Proprietary"}
+
+[project.scripts]
+t2-relink-across-projects = "run_tool:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "resolve*", "tools*"]

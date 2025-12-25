@@ -1,0 +1,4 @@
+00:00:05 tighten crop on host
+00:00:12 audio pop remove
+00:00:18 add caption for CTA
+00:00:26 adjust color to match brand

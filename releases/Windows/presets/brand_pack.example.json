@@ -1,0 +1,20 @@
+{
+  "name": "Demo Brand Pack",
+  "version": "1.0",
+  "canonical_assets": ["logo_primary.png", "endcard_16x9.mov"],
+  "color_palette": ["#FFFFFF", "#000000", "#FF5500"],
+  "fonts": ["Inter", "Montserrat"],
+  "brand_tokens": ["logo", "brand", "endcard"],
+  "layout_constraints": {
+    "9x16": {
+      "safe_zone": {"top": 0.1, "bottom": 0.2, "left": 0.05, "right": 0.05},
+      "avoid_zones": [{"x": 0.0, "y": 0.8, "w": 1.0, "h": 0.2}]
+    }
+  },
+  "delivery_specs": {
+    "instagram_reel": {
+      "resolution": "1080x1920",
+      "fps": 30
+    }
+  }
+}
