@@ -1,8 +1,8 @@
 {
-  "version": "0.3.2",
+  "version": "0.3.3",
   "release_date": "2025-12-24",
   "min_python": "3.9",
-  "changelog": "Added uninstall functionality",
+  "changelog": "Auto-update now also updates the download folder (not just installed location)",
   "download_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest",
   "windows_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-Windows.zip",
   "macos_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-macOS.zip",
