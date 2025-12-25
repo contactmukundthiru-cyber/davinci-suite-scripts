@@ -1,4 +1,4 @@
-RESOLVE PRODUCTION SUITE v0.3.1 - MACOS
+RESOLVE PRODUCTION SUITE v0.3.2 - MACOS
 ===========================================
 
 HOW TO INSTALL:

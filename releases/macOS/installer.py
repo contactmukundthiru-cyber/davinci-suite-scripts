@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.1"
+VERSION = "0.3.2"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -718,6 +718,99 @@ def run_installation():
     wait_for_key()
 
 
+# =============================================================================
+# Uninstall
+# =============================================================================
+
+def run_uninstall():
+    """Uninstall Resolve Production Suite."""
+    print_header()
+    print("UNINSTALL\n")
+
+    # Find installation directory
+    if IS_WINDOWS:
+        install_dir = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "ResolveProductionSuite"
+    else:
+        install_dir = Path.home() / ".local" / "share" / "resolve-production-suite"
+
+    data_dir = get_data_dir()
+
+    # Check if installed
+    if not install_dir.exists():
+        print_warning("Resolve Production Suite is not installed.")
+        print(f"  Expected location: {install_dir}")
+        wait_for_key()
+        return
+
+    print(f"Installation found: {install_dir}")
+    print(f"Data directory: {data_dir}")
+    print()
+
+    if not prompt("Are you sure you want to uninstall?", "n"):
+        print("Uninstall cancelled.")
+        wait_for_key()
+        return
+
+    remove_data = prompt("Also remove user data (logs, reports, presets)?", "n")
+
+    print()
+    print_step("Uninstalling...")
+
+    try:
+        # Remove desktop shortcut
+        desktop = Path.home() / "Desktop"
+        if IS_WINDOWS:
+            shortcut = desktop / "Resolve Production Suite.lnk"
+            if shortcut.exists():
+                shortcut.unlink()
+                print_success("Removed desktop shortcut")
+        elif IS_LINUX:
+            shortcut = desktop / "resolve-production-suite.desktop"
+            if shortcut.exists():
+                shortcut.unlink()
+                print_success("Removed desktop shortcut")
+
+        # Remove from PATH on Windows
+        if IS_WINDOWS:
+            try:
+                import winreg
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment", 0, winreg.KEY_ALL_ACCESS) as key:
+                    try:
+                        path_value, _ = winreg.QueryValueEx(key, "Path")
+                        install_str = str(install_dir)
+                        if install_str in path_value:
+                            # Remove our path
+                            paths = [p for p in path_value.split(";") if p and p != install_str]
+                            new_path = ";".join(paths)
+                            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
+                            print_success("Removed from PATH")
+                    except WindowsError:
+                        pass
+            except Exception:
+                pass
+
+        # Remove installation directory
+        if install_dir.exists():
+            shutil.rmtree(install_dir)
+            print_success(f"Removed: {install_dir}")
+
+        # Remove data directory if requested
+        if remove_data and data_dir.exists():
+            shutil.rmtree(data_dir)
+            print_success(f"Removed: {data_dir}")
+
+        print()
+        print(f"{Colors.GREEN}Uninstall complete!{Colors.END}")
+        print("\nResolve Production Suite has been removed from your system.")
+
+    except Exception as e:
+        print_error(f"Uninstall failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+    wait_for_key()
+
+
 def main():
     """Main entry point with menu."""
     print_header()
@@ -747,11 +840,12 @@ def main():
         print("\nWhat would you like to do?\n")
         print("  1. Install Resolve Production Suite")
         print("  2. Check for Updates")
-        print("  3. Exit")
+        print("  3. Uninstall")
+        print("  4. Exit")
         print()
 
         try:
-            choice = input("Enter choice (1-3): ").strip()
+            choice = input("Enter choice (1-4): ").strip()
 
             if choice == "1":
                 run_installation()
@@ -759,10 +853,13 @@ def main():
             elif choice == "2":
                 run_updater()
             elif choice == "3":
+                run_uninstall()
+                break
+            elif choice == "4":
                 print("\nGoodbye!")
                 sys.exit(0)
             else:
-                print("Invalid choice. Please enter 1, 2, or 3.")
+                print("Invalid choice. Please enter 1, 2, 3, or 4.")
         except KeyboardInterrupt:
             print("\n\nGoodbye!")
             sys.exit(0)
