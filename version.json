@@ -1,8 +1,8 @@
 {
-  "version": "0.3.7",
+  "version": "0.3.8",
   "release_date": "2025-12-24",
   "min_python": "3.9",
-  "changelog": "Fixed Windows update - now copies files individually to avoid locking issues",
+  "changelog": "Added comprehensive tool usage instructions to README files",
   "download_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest",
   "windows_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-Windows.zip",
   "macos_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-macOS.zip",
