@@ -1,80 +1,78 @@
 # Resolve Production Suite
 
-Commercial-grade, Linux-first production tools for DaVinci Resolve Studio/Free. This v2 suite focuses on revision speed, consistency, and deliverable correctness for high-volume agencies and editors.
+Professional workflow automation tools for DaVinci Resolve Studio/Free. This suite focuses on revision speed, consistency, and deliverable correctness for high-volume agencies and editors.
 
-## Highlights
-- 10 workflow insurance tools with unified reports, presets, and pack formats.
-- Linux-first (Windows/macOS supported where feasible).
-- External UI v2 (PySide6) plus CLI automation, presets, and report viewer.
-- Deterministic reporting, dry-run support, centralized logging.
+**Current Version:** 0.3.3
 
-## Tools
-1. Revision Resolver (appearance-preserving asset swap)
-2. Relink Across Projects (brand kit rollout)
-3. Constraint-Based Smart Reframer
-4. Caption-Aware Layout Protector
-5. Feedback -> Marker -> Task Compiler
-6. Timeline Normalizer for Handoff
-7. Component-Style Graphics System
-8. Delivery Spec Enforcer
-9. Change-Impact Analyzer
-10. Project Audit & Brand Drift Detector
+## Quick Start
 
-## Resolve API Limits (Honest Notes)
+### Windows
+1. Download `ResolveProductionSuite-Windows.zip`
+2. Extract the folder
+3. Double-click `CLICK_ME_FIRST.bat`
+4. Follow the on-screen menu
+
+### macOS
+1. Download `ResolveProductionSuite-macOS.zip`
+2. Extract the folder
+3. Double-click `DOUBLE_CLICK_ME.command`
+4. Follow the on-screen menu
+
+The installer will automatically download Python if needed and set everything up for you.
+
+## What's Included
+
+10 workflow automation tools for DaVinci Resolve:
+
+| # | Tool | What It Does |
+|---|------|--------------|
+| 1 | **Revision Resolver** | Swap old assets with new versions while preserving clip appearance (transforms, effects, timing) |
+| 2 | **Relink Across Projects** | Roll out brand kit updates across multiple projects simultaneously |
+| 3 | **Smart Reframer** | Intelligently reframe content for different aspect ratios (16:9 → 9:16, 1:1, 4:5) |
+| 4 | **Caption Layout Protector** | Ensure captions don't overlap with important visual elements |
+| 5 | **Feedback Compiler** | Convert client feedback notes into timeline markers and task lists |
+| 6 | **Timeline Normalizer** | Check and normalize technical specs for project handoff |
+| 7 | **Component Graphics** | Manage reusable graphics with a registry system |
+| 8 | **Delivery Spec Enforcer** | Validate render settings against platform requirements |
+| 9 | **Change Impact Analyzer** | Compare timeline versions to understand what changed |
+| 10 | **Brand Drift Detector** | Audit projects for brand guideline compliance |
+
+## Features
+
+- **Automatic Updates**: Check for updates directly from the app
+- **Easy Installation**: One-click installer handles Python and dependencies
+- **Uninstall Support**: Clean removal via the installer menu
+- **Detailed Reports**: All tools generate JSON, CSV, and HTML reports
+- **Dry Run Mode**: Preview changes before applying them
+- **Preset System**: Save and load tool configurations
+
+## Documentation
+
+- [docs/USER_GUIDE.md](docs/USER_GUIDE.md) - Complete tool documentation
+- [docs/PRODUCTS.md](docs/PRODUCTS.md) - Detailed specifications for each tool
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Common issues and solutions
+
+## System Requirements
+
+| Component | Requirement |
+|-----------|-------------|
+| OS | Windows 10/11 or macOS 10.15+ |
+| Python | 3.9 or later (auto-installed) |
+| DaVinci Resolve | Studio or Free (with scripting enabled) |
+| RAM | 8GB minimum, 16GB recommended |
+| Disk | 500MB for installation |
+
+## Resolve API Notes
+
 - Clip transforms and Fusion graphs are not fully scriptable. Where transforms cannot be safely applied, the tools generate guided fix lists and markers.
 - Subtitle geometry is not accessible. Caption-safe uses safe zone heuristics.
 - Some render settings are unavailable. Delivery tool generates a manifest/checklist instead of auto-applying unsupported settings.
 
-## Repo Layout
-- `core/`: shared engine (config, logging, reports, schema validation)
-- `resolve/`: Resolve scripting wrapper + limitations
-- `tools/`: the 10 tool modules
-- `ui/`: PySide6 UI app
-- `schemas/`: JSON schemas for Mapping/Brand/Delivery packs
-- `presets/`: example packs
-- `scripts/`: demo runner + sample pack generator
-- `docs/`: installation and usage
-
-## Installation
-
-### Standalone Installer (Recommended)
-Download and run the installer for your platform - no Python required:
-- **Windows:** `ResolveProductionSuite-Setup.exe`
-- **macOS:** `ResolveProductionSuite-Setup`
-- **Linux:** `ResolveProductionSuite-Setup`
-
-Just double-click and follow the prompts!
-
-### From Source (Developers)
-```bash
-# Linux/macOS
-./install.sh
-
-# Windows PowerShell
-.\install.ps1
-```
-
-### Build Standalone Installer
-To build the standalone installer yourself:
-```bash
-pip install pyinstaller
-python build.py
-# Output: dist/ResolveProductionSuite-Setup.exe (Windows)
-#         dist/ResolveProductionSuite-Setup (macOS/Linux)
-```
-
-## Documentation
-- [docs/INSTALL.md](docs/INSTALL.md) - Detailed installation guide
-- [docs/QUICKSTART.md](docs/QUICKSTART.md) - Quick start guide
-- [docs/V2_DESIGN.md](docs/V2_DESIGN.md) - V2 design notes
-- [docs/STANDALONE_SCRIPTS.md](docs/STANDALONE_SCRIPTS.md) - Standalone script documentation
-
-Each tool also has a standalone bundle under `products/` with its own README and packaging files.
-
 ## License
+
 This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
 ## Support
+
 - Email: contactmukundthiru@gmail.com
-- Open an issue on GitHub for bugs or feature requests
-- Contributions welcome via pull requests
+- GitHub: https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/issues
