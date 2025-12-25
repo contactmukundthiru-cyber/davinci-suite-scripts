@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -482,19 +482,20 @@ def get_python(venv_dir):
 
 def install_dependencies(venv_dir, install_dir, install_ui=True):
     """Install Python dependencies."""
-    pip = get_pip(venv_dir)
+    python = get_python(venv_dir)
 
+    # Use python -m pip instead of pip directly (fixes Windows upgrade issue)
     print_step("Upgrading pip...")
-    subprocess.run([str(pip), "install", "--upgrade", "pip", "setuptools", "wheel", "-q"], check=True)
+    subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel", "-q"], check=True)
 
     print_step("Installing dependencies...")
     req_file = install_dir / "requirements.txt"
     if req_file.exists():
-        subprocess.run([str(pip), "install", "-r", str(req_file), "-q"], check=True)
+        subprocess.run([str(python), "-m", "pip", "install", "-r", str(req_file), "-q"], check=True)
 
     print_step("Installing package...")
     extras = "[ui]" if install_ui else ""
-    subprocess.run([str(pip), "install", "-e", f"{install_dir}{extras}", "-q"], check=True)
+    subprocess.run([str(python), "-m", "pip", "install", "-e", f"{install_dir}{extras}", "-q"], check=True)
 
     print_success("Dependencies installed")
 
