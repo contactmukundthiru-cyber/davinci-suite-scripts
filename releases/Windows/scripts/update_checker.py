@@ -19,24 +19,27 @@ import urllib.error
 from pathlib import Path
 from typing import Optional, Tuple
 
-# Configuration - Update these for your distribution
+# Configuration
+GITHUB_USER = "contactmukundthiru-cyber"
+GITHUB_REPO = "davinci-suite-scripts"
+
 VERSION_CHECK_URL = os.environ.get(
     "RPS_VERSION_URL",
-    "https://raw.githubusercontent.com/yourusername/resolve-production-suite/main/VERSION"
+    f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/main/version.json"
 )
 RELEASES_URL = os.environ.get(
     "RPS_RELEASES_URL",
-    "https://github.com/yourusername/resolve-production-suite/releases"
+    f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/releases"
 )
 GUMROAD_URL = os.environ.get(
     "RPS_GUMROAD_URL",
-    "https://yourusername.gumroad.com/l/resolve-production-suite"
+    "https://mukundthiru.gumroad.com/l/resolve-production-suite"
 )
 
-# For version info JSON (alternative to plain VERSION file)
+# For version info JSON
 VERSION_JSON_URL = os.environ.get(
     "RPS_VERSION_JSON_URL",
-    ""  # Set this if using JSON version info
+    f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/main/version.json"
 )
 
 
@@ -92,20 +95,26 @@ def fetch_remote_version() -> Optional[dict]:
         except (urllib.error.URLError, json.JSONDecodeError):
             pass
 
-    # Fall back to plain VERSION file
+    # Fall back to VERSION_CHECK_URL (try JSON first, then plain text)
     try:
         req = urllib.request.Request(
             VERSION_CHECK_URL,
             headers={"User-Agent": "ResolveProductionSuite-UpdateChecker"}
         )
         with urllib.request.urlopen(req, timeout=10) as response:
-            version = response.read().decode().strip()
-            return {
-                "version": version,
-                "changelog": None,
-                "download_url": GUMROAD_URL or RELEASES_URL
-            }
-    except urllib.error.URLError as e:
+            content = response.read().decode().strip()
+            # Try JSON first
+            try:
+                data = json.loads(content)
+                return data
+            except json.JSONDecodeError:
+                # Plain text version file
+                return {
+                    "version": content,
+                    "changelog": None,
+                    "download_url": GUMROAD_URL or RELEASES_URL
+                }
+    except urllib.error.URLError:
         return None
 
 
