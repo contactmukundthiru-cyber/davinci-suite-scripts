@@ -1,5 +1,5 @@
 ================================================================================
-                    RESOLVE PRODUCTION SUITE v0.3.14
+                    RESOLVE PRODUCTION SUITE v0.3.15
 ================================================================================
 
 10 Workflow Automation Tools for DaVinci Resolve
