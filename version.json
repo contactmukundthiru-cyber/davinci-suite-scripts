@@ -1,8 +1,8 @@
 {
-  "version": "0.3.10",
+  "version": "0.3.11",
   "release_date": "2025-12-26",
   "min_python": "3.9",
-  "changelog": "Comprehensive documentation and bug fixes: Enhanced README with detailed tool descriptions and use cases, fixed macOS shortcut (.command extension for double-click), fixed macOS uninstall shortcut removal, removed unused code",
+  "changelog": "Clearer documentation: Explains this is a companion app (not a Resolve plugin), adds workflow examples, clarifies DaVinci Resolve must be running, includes GUI mockup diagram",
   "download_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest",
   "windows_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-Windows.zip",
   "macos_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-macOS.zip",
