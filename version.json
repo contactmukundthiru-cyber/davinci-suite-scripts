@@ -1,8 +1,8 @@
 {
-  "version": "0.3.9",
-  "release_date": "2025-12-24",
+  "version": "0.3.10",
+  "release_date": "2025-12-26",
   "min_python": "3.9",
-  "changelog": "User-friendly improvements: desktop shortcut created during updates, macOS shortcut support, improved installation and update messages",
+  "changelog": "Comprehensive documentation and bug fixes: Enhanced README with detailed tool descriptions and use cases, fixed macOS shortcut (.command extension for double-click), fixed macOS uninstall shortcut removal, removed unused code",
   "download_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest",
   "windows_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-Windows.zip",
   "macos_url": "https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/releases/latest/download/ResolveProductionSuite-macOS.zip",

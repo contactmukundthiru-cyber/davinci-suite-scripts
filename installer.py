@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.9"
+VERSION = "0.3.10"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -275,7 +275,6 @@ def apply_update(zip_path, install_dir, is_current_dir=False):
             # For current directory, copy files individually (avoids locking issues)
             # Skip .venv and other runtime files
             skip_dirs = {'.venv', '__pycache__', '.git'}
-            skip_files = set()
 
             for item in content_dir.iterdir():
                 if item.name in skip_dirs:
@@ -685,11 +684,11 @@ $s.Save()
 
     elif IS_MACOS:
         try:
-            # Create macOS alias/shortcut using AppleScript
-            shortcut_path = desktop / "Resolve Production Suite"
+            # Create macOS shortcut with .command extension so it's double-clickable in Finder
+            shortcut_path = desktop / "Resolve Production Suite.command"
             target = install_dir / "resolve-suite-ui"
 
-            # Create a simple shell script wrapper that users can double-click
+            # Create a shell script wrapper that users can double-click
             shortcut_path.write_text(f"""#!/bin/bash
 # Resolve Production Suite Launcher
 cd "{install_dir}"
@@ -745,7 +744,7 @@ def ensure_desktop_shortcut(install_dir):
     if IS_WINDOWS:
         shortcut_path = desktop / "Resolve Production Suite.lnk"
     elif IS_MACOS:
-        shortcut_path = desktop / "Resolve Production Suite"
+        shortcut_path = desktop / "Resolve Production Suite.command"
     elif IS_LINUX:
         shortcut_path = desktop / "resolve-production-suite.desktop"
     else:
@@ -896,6 +895,11 @@ def run_uninstall():
         desktop = Path.home() / "Desktop"
         if IS_WINDOWS:
             shortcut = desktop / "Resolve Production Suite.lnk"
+            if shortcut.exists():
+                shortcut.unlink()
+                print_success("Removed desktop shortcut")
+        elif IS_MACOS:
+            shortcut = desktop / "Resolve Production Suite.command"
             if shortcut.exists():
                 shortcut.unlink()
                 print_success("Removed desktop shortcut")
