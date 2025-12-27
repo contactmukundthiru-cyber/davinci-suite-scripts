@@ -313,75 +313,81 @@ endlocal
 def create_windows_readme(dest_dir):
     """Create Windows README."""
     readme = dest_dir / "README.txt"
-    readme.write_text(f"""RESOLVE PRODUCTION SUITE v{VERSION} - WINDOWS
-=============================================
+    readme.write_text(f"""================================================================================
+                    RESOLVE PRODUCTION SUITE v{VERSION}
+================================================================================
 
-HOW TO INSTALL:
+10 Workflow Automation Tools for DaVinci Resolve
 
-1. Double-click "CLICK_ME_FIRST.bat"
+================================================================================
+                         HOW TO INSTALL
+================================================================================
 
-2. If Python is not installed, it will download
-   and install it automatically (takes 2-3 minutes)
-
-3. Follow the on-screen menu to complete installation
-
-That's it!
-
-
-HOW TO USE THE TOOLS:
-
-After installation, you can use the tools in two ways:
-
-1. COMMAND LINE (recommended for automation):
-
-   Open Command Prompt or PowerShell, then:
-
-   resolve-suite list                    - See all available tools
-   resolve-suite run t1_revision_resolver --dry-run  - Preview a tool
-   resolve-suite run t6_timeline_normalizer          - Run a tool
-
-2. DESKTOP UI:
-
-   Double-click the desktop shortcut "Resolve Production Suite"
-   Or run: resolve-suite-ui
+  1. Double-click "CLICK_ME_FIRST.bat"
+  2. Python installs automatically if needed (2-3 min wait)
+  3. Select "Install" from the menu
+  4. Done! A desktop shortcut is created.
 
 
-THE 10 TOOLS:
+================================================================================
+                          HOW TO USE
+================================================================================
 
-1. Revision Resolver      - Swap assets while keeping appearance
-2. Relink Across Projects - Update assets across multiple projects
-3. Smart Reframer         - Convert 16:9 to 9:16, 1:1, etc.
-4. Caption Layout         - Check caption safe zones
-5. Feedback Compiler      - Convert feedback to timeline markers
-6. Timeline Normalizer    - Check FPS, resolution, disabled clips
-7. Component Graphics     - Manage reusable graphics library
-8. Delivery Spec Enforcer - Validate render settings for YouTube, etc.
-9. Change Impact Analyzer - Compare timeline versions
-10. Brand Drift Detector  - Audit brand guideline compliance
+  1. Open DaVinci Resolve (must be running first!)
+  2. Double-click "Resolve Production Suite" on your Desktop
+  3. Click "Connect Resolve" button
+  4. Select your project and timeline
+  5. Choose a tool, click "Run Tool"
 
+That's it! The app auto-detects Resolve - no configuration needed.
 
-DETAILED DOCUMENTATION:
-
-See the docs folder for complete documentation:
-- docs/USER_GUIDE.md      - Complete tool documentation
-- docs/PRODUCTS.md        - Detailed specifications
-- docs/QUICKSTART.md      - Quick start guide
+SHORTCUT MISSING? Run this in Command Prompt:
+  resolve-suite.bat shortcut
 
 
-TROUBLESHOOTING:
+================================================================================
+                          THE 10 TOOLS
+================================================================================
 
-Q: It says "Windows protected your PC"
-A: Click "More info" then "Run anyway"
+ 1. Revision Resolver      - Replace assets across all timelines
+ 2. Relink Across Projects - Update assets across multiple projects
+ 3. Smart Reframer         - Convert 16:9 to 9:16, 1:1, etc.
+ 4. Caption Layout         - Verify captions in safe zones
+ 5. Feedback Compiler      - Convert feedback to timeline markers
+ 6. Timeline Normalizer    - Check FPS, resolution, disabled clips
+ 7. Component Graphics     - Manage reusable graphics library
+ 8. Delivery Spec Enforcer - Validate YouTube/Vimeo render settings
+ 9. Change Impact Analyzer - Compare timeline versions
+10. Brand Drift Detector   - Audit brand guideline compliance
 
-Q: Download failed
-A: Check your internet connection and try again
-
-Q: Nothing happens when I double-click
-A: Right-click the file and select "Run as administrator"
+See docs/USER_GUIDE.md for detailed documentation on each tool.
 
 
-SUPPORT:
+================================================================================
+                       TROUBLESHOOTING
+================================================================================
+
+"Resolve not connected"
+  -> Make sure DaVinci Resolve is RUNNING before launching this app
+
+"Windows protected your PC"
+  -> Click "More info" then "Run anyway"
+
+Nothing happens when I double-click
+  -> Right-click > "Run as administrator"
+
+Desktop shortcut missing
+  -> Run: resolve-suite.bat shortcut
+
+
+================================================================================
+                          SUPPORT
+================================================================================
+
 Email: contactmukundthiru@gmail.com
+Docs:  See the docs/ folder for complete documentation
+
+================================================================================
 """)
     print("  Created: README.txt")
 
@@ -572,79 +578,82 @@ read -p "Press Enter to close..."
 def create_macos_readme(dest_dir):
     """Create macOS README."""
     readme = dest_dir / "README.txt"
-    readme.write_text(f"""RESOLVE PRODUCTION SUITE v{VERSION} - MACOS
-===========================================
+    readme.write_text(f"""================================================================================
+                    RESOLVE PRODUCTION SUITE v{VERSION}
+================================================================================
 
-HOW TO INSTALL:
+10 Workflow Automation Tools for DaVinci Resolve
 
-1. Double-click "DOUBLE_CLICK_ME.command"
+================================================================================
+                         HOW TO INSTALL
+================================================================================
 
-2. If you see "unidentified developer" warning:
-   - Right-click > Open > Open
-   - Or: System Preferences > Security > Open Anyway
-
-3. If Python is not installed, it will download
-   and install it automatically
-
-4. Follow the on-screen menu to complete installation
-
-That's it!
+  1. Double-click "DOUBLE_CLICK_ME.command"
+  2. If you see "unidentified developer": Right-click > Open > Open
+  3. Python installs automatically if needed
+  4. Select "Install" from the menu
+  5. Done! A desktop shortcut is created.
 
 
-HOW TO USE THE TOOLS:
+================================================================================
+                          HOW TO USE
+================================================================================
 
-After installation, you can use the tools in two ways:
+  1. Open DaVinci Resolve (must be running first!)
+  2. Double-click "Resolve Production Suite.command" on your Desktop
+  3. Click "Connect Resolve" button
+  4. Select your project and timeline
+  5. Choose a tool, click "Run Tool"
 
-1. COMMAND LINE (recommended for automation):
+That's it! The app auto-detects Resolve - no configuration needed.
 
-   Open Terminal, then:
-
-   resolve-suite list                    - See all available tools
-   resolve-suite run t1_revision_resolver --dry-run  - Preview a tool
-   resolve-suite run t6_timeline_normalizer          - Run a tool
-
-2. DESKTOP UI:
-
-   Double-click the desktop alias "Resolve Production Suite"
-   Or run: resolve-suite-ui
+SHORTCUT MISSING? Run this in Terminal:
+  ./resolve-suite shortcut
 
 
-THE 10 TOOLS:
+================================================================================
+                          THE 10 TOOLS
+================================================================================
 
-1. Revision Resolver      - Swap assets while keeping appearance
-2. Relink Across Projects - Update assets across multiple projects
-3. Smart Reframer         - Convert 16:9 to 9:16, 1:1, etc.
-4. Caption Layout         - Check caption safe zones
-5. Feedback Compiler      - Convert feedback to timeline markers
-6. Timeline Normalizer    - Check FPS, resolution, disabled clips
-7. Component Graphics     - Manage reusable graphics library
-8. Delivery Spec Enforcer - Validate render settings for YouTube, etc.
-9. Change Impact Analyzer - Compare timeline versions
-10. Brand Drift Detector  - Audit brand guideline compliance
+ 1. Revision Resolver      - Replace assets across all timelines
+ 2. Relink Across Projects - Update assets across multiple projects
+ 3. Smart Reframer         - Convert 16:9 to 9:16, 1:1, etc.
+ 4. Caption Layout         - Verify captions in safe zones
+ 5. Feedback Compiler      - Convert feedback to timeline markers
+ 6. Timeline Normalizer    - Check FPS, resolution, disabled clips
+ 7. Component Graphics     - Manage reusable graphics library
+ 8. Delivery Spec Enforcer - Validate YouTube/Vimeo render settings
+ 9. Change Impact Analyzer - Compare timeline versions
+10. Brand Drift Detector   - Audit brand guideline compliance
 
-
-DETAILED DOCUMENTATION:
-
-See the docs folder for complete documentation:
-- docs/USER_GUIDE.md      - Complete tool documentation
-- docs/PRODUCTS.md        - Detailed specifications
-- docs/QUICKSTART.md      - Quick start guide
+See docs/USER_GUIDE.md for detailed documentation on each tool.
 
 
-TROUBLESHOOTING:
+================================================================================
+                       TROUBLESHOOTING
+================================================================================
 
-Q: "unidentified developer" warning
-A: Right-click > Open > Open
+"Resolve not connected"
+  -> Make sure DaVinci Resolve is RUNNING before launching this app
 
-Q: Terminal says "permission denied"
-A: Open Terminal, run: chmod +x DOUBLE_CLICK_ME.command
+"unidentified developer" warning
+  -> Right-click > Open > Open
 
-Q: Download failed
-A: Check your internet connection and try again
+"permission denied"
+  -> Run: chmod +x DOUBLE_CLICK_ME.command
+
+Desktop shortcut missing
+  -> Run: ./resolve-suite shortcut
 
 
-SUPPORT:
+================================================================================
+                          SUPPORT
+================================================================================
+
 Email: contactmukundthiru@gmail.com
+Docs:  See the docs/ folder for complete documentation
+
+================================================================================
 """)
     print("  Created: README.txt")
 

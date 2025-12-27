@@ -40,11 +40,19 @@ class ResolveApp:
             script = importlib.import_module(module_name)
         except Exception as exc:
             raise ResolveConnectionError(
-                "Unable to import DaVinciResolveScript. Configure RESOLVE_SCRIPT_API or install the module."
+                "Cannot find DaVinci Resolve. Please ensure:\n"
+                "  1. DaVinci Resolve is installed\n"
+                "  2. Resolve is running BEFORE clicking Connect\n"
+                "  3. In Resolve: Preferences → System → General → Enable 'External scripting using'"
             ) from exc
         resolve = script.scriptapp("Resolve")
         if resolve is None:
-            raise ResolveConnectionError("DaVinci Resolve scripting app not available.")
+            raise ResolveConnectionError(
+                "DaVinci Resolve is not responding. Please:\n"
+                "  1. Make sure Resolve is open and running\n"
+                "  2. Open a project in Resolve first\n"
+                "  3. Try clicking Connect again"
+            )
         project_manager = resolve.GetProjectManager()
         project = project_manager.GetCurrentProject() if project_manager else None
         media_pool = project.GetMediaPool() if project else None
@@ -133,6 +141,11 @@ class ResolveApp:
         project = self.get_project()
         if not project:
             return None
+        try:
+            return project.DuplicateTimeline(timeline, new_name)
+        except Exception:
+            self.logger.warning("Timeline duplication failed; API may not support duplicate.")
+            return None
 
     def set_current_timeline(self, timeline: Any) -> bool:
         project = self.get_project()
@@ -144,11 +157,6 @@ class ResolveApp:
             return False
         self.refresh()
         return bool(ok)
-        try:
-            return project.DuplicateTimeline(timeline, new_name)
-        except Exception:
-            self.logger.warning("Timeline duplication failed; API may not support duplicate.")
-            return None
 
     def get_timeline_items(self, timeline: Any, track_type: str, track_index: int) -> list[Any]:
         try:

@@ -23,10 +23,41 @@ echo ""
 echo "This will install the suite on your Mac."
 echo ""
 
+# Global variable for Python command
+PYTHON_CMD=""
+
+# Function to find Python in common locations
+find_python() {
+    # Check Python framework location (installed via pkg)
+    if [ -x "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3" ]; then
+        PYTHON_CMD="/Library/Frameworks/Python.framework/Versions/3.11/bin/python3"
+        return 0
+    fi
+    if [ -x "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3" ]; then
+        PYTHON_CMD="/Library/Frameworks/Python.framework/Versions/3.12/bin/python3"
+        return 0
+    fi
+    # Check Homebrew locations
+    if [ -x "/opt/homebrew/bin/python3" ]; then
+        PYTHON_CMD="/opt/homebrew/bin/python3"
+        return 0
+    fi
+    if [ -x "/usr/local/bin/python3" ]; then
+        PYTHON_CMD="/usr/local/bin/python3"
+        return 0
+    fi
+    # Check PATH
+    if command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+        return 0
+    fi
+    return 1
+}
+
 # Function to check Python version
 check_python() {
-    if command -v python3 &> /dev/null; then
-        PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+    if find_python; then
+        PYTHON_VERSION=$($PYTHON_CMD -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
         MAJOR=$(echo $PYTHON_VERSION | cut -d. -f1)
         MINOR=$(echo $PYTHON_VERSION | cut -d. -f2)
         if [ "$MAJOR" -ge 3 ] && [ "$MINOR" -ge 9 ]; then
@@ -47,7 +78,6 @@ else
     echo -e "${YELLOW}[!]${NC} Python 3.9+ is not installed."
     echo ""
     echo "I will download and install Python for you."
-    echo "This takes about 2-3 minutes."
     echo ""
 
     # Check if Homebrew is available
@@ -72,19 +102,18 @@ else
         echo "Downloading Python from python.org..."
         echo ""
 
-        # Download Python installer
-        PYTHON_PKG="python-3.11.7-macos11.pkg"
-        PYTHON_URL="https://www.python.org/ftp/python/3.11.7/$PYTHON_PKG"
+        # Download Python installer - use universal2 package for M1/Intel compatibility
+        PYTHON_PKG="python-3.11.9-macos11.pkg"
+        PYTHON_URL="https://www.python.org/ftp/python/3.11.9/$PYTHON_PKG"
 
+        echo "Downloading from: $PYTHON_URL"
         curl -L -o "/tmp/$PYTHON_PKG" "$PYTHON_URL" --progress-bar
 
-        if [ ! -f "/tmp/$PYTHON_PKG" ]; then
+        if [ ! -f "/tmp/$PYTHON_PKG" ] || [ ! -s "/tmp/$PYTHON_PKG" ]; then
             echo ""
             echo -e "${RED}[ERROR]${NC} Download failed!"
             echo ""
-            echo "Please check your internet connection and try again."
-            echo ""
-            echo "Or download Python manually from:"
+            echo "Please download Python manually from:"
             echo "  https://www.python.org/downloads/"
             echo ""
             read -p "Press Enter to exit..."
@@ -96,20 +125,27 @@ else
         echo "  INSTALLING PYTHON"
         echo "========================================"
         echo ""
-        echo "The Python installer will now open."
-        echo "Please follow the installation prompts."
+        echo "Installing Python (you may need to enter your password)..."
         echo ""
 
-        # Open the installer
-        open "/tmp/$PYTHON_PKG"
+        # Install using sudo installer for silent installation
+        sudo installer -pkg "/tmp/$PYTHON_PKG" -target /
 
-        echo "Waiting for Python installation to complete..."
-        echo "(Close this window and run again after Python is installed)"
-        echo ""
-        read -p "Press Enter after Python is installed..."
+        INSTALL_RESULT=$?
 
         # Clean up
         rm -f "/tmp/$PYTHON_PKG"
+
+        if [ $INSTALL_RESULT -ne 0 ]; then
+            echo ""
+            echo -e "${RED}[ERROR]${NC} Installation failed!"
+            echo ""
+            echo "Please download and install Python manually from:"
+            echo "  https://www.python.org/downloads/"
+            echo ""
+            read -p "Press Enter to exit..."
+            exit 1
+        fi
 
         # Check again
         if check_python; then
@@ -117,10 +153,10 @@ else
             echo -e "${GREEN}[OK]${NC} Python installed successfully!"
         else
             echo ""
-            echo -e "${YELLOW}[!]${NC} Python not detected yet."
+            echo -e "${YELLOW}[!]${NC} Python may require a new terminal session."
             echo ""
             echo "Please close this window and double-click"
-            echo "DOUBLE_CLICK_ME.command again after installation."
+            echo "DOUBLE_CLICK_ME.command again."
             echo ""
             read -p "Press Enter to exit..."
             exit 0
@@ -132,8 +168,8 @@ echo ""
 echo "Starting Resolve Production Suite installer..."
 echo ""
 
-# Run the Python installer
-python3 installer.py
+# Run the Python installer using the found Python
+$PYTHON_CMD installer.py
 
 echo ""
 read -p "Press Enter to close..."
