@@ -1,114 +1,50 @@
 # Quick Start Guide
 
-Get up and running with the Resolve Production Suite in 5 minutes.
+Get running in 2 minutes.
 
 ## Step 1: Install
 
-### Windows
-1. Extract the zip file
-2. Double-click `CLICK_ME_FIRST.bat`
-3. Select option 1 (Install)
+**Windows:** Double-click `CLICK_ME_FIRST.bat` → Select "Install"
 
-### macOS
-1. Extract the zip file
-2. Double-click `DOUBLE_CLICK_ME.command`
-3. Select option 1 (Install)
+**macOS:** Double-click `DOUBLE_CLICK_ME.command` → Select "Install"
 
-## Step 2: Open DaVinci Resolve
+## Step 2: Use
 
-Make sure DaVinci Resolve is running before using the tools. The tools communicate with Resolve via its scripting API.
+1. **Open DaVinci Resolve** (must be running first!)
+2. Double-click "Resolve Production Suite" on your Desktop
+3. Click "Connect Resolve"
+4. Select your project and timeline
+5. Choose a tool, click "Run Tool"
 
-## Step 3: Run Your First Tool
+That's it! No configuration needed.
 
-After installation, you can run tools from the command line:
+## The 10 Tools
 
-```bash
-# List all available tools
-resolve-suite list
+| Tool | What it does |
+|------|--------------|
+| 1. Revision Resolver | Replace assets across all timelines |
+| 2. Relink Across Projects | Update assets across multiple projects |
+| 3. Smart Reframer | Convert 16:9 to 9:16, 1:1, etc. |
+| 4. Caption Layout | Verify captions in safe zones |
+| 5. Feedback Compiler | Convert feedback to timeline markers |
+| 6. Timeline Normalizer | Check FPS, resolution, disabled clips |
+| 7. Component Graphics | Manage reusable graphics library |
+| 8. Delivery Spec Enforcer | Validate YouTube/Vimeo settings |
+| 9. Change Impact Analyzer | Compare timeline versions |
+| 10. Brand Drift Detector | Audit brand compliance |
 
-# Run a specific tool with dry-run mode (preview changes)
-resolve-suite run t1_revision_resolver --dry-run
+## Reports
 
-# Run a tool with options file
-resolve-suite run t6_timeline_normalizer --options /path/to/options.json
-```
+Reports are saved to:
+- **Windows:** `%USERPROFILE%\.rps\reports`
+- **macOS:** `~/.rps/reports`
 
-Or use the desktop shortcut to open the GUI application.
+## Troubleshooting
 
-## Quick Examples
+**"Resolve not connected"** → Make sure Resolve is running first
 
-### Example 1: Check Timeline Technical Specs
+**Shortcut missing?** → Run `resolve-suite.bat shortcut` (Windows) or `./resolve-suite shortcut` (macOS)
 
-Run the Timeline Normalizer to verify your timeline meets delivery requirements:
+## More Help
 
-```bash
-resolve-suite run t6_timeline_normalizer --dry-run
-```
-
-This will report:
-- Frame rate verification
-- Resolution check
-- Disabled clips
-- Muted tracks
-- Duplicate clip names
-
-### Example 2: Create Markers from Feedback
-
-Have client feedback in a text file? Convert it to timeline markers:
-
-```bash
-resolve-suite run t5_feedback_compiler --options feedback_options.json
-```
-
-Where `feedback_options.json` contains:
-```json
-{
-  "feedback_file": "/path/to/client_feedback.txt",
-  "marker_color": "red",
-  "create_task_list": true
-}
-```
-
-### Example 3: Audit Brand Compliance
-
-Check if your project follows brand guidelines:
-
-```bash
-resolve-suite run t10_brand_drift_detector --options brand_options.json
-```
-
-## Tool Options Files
-
-Each tool accepts a JSON options file. Example structure:
-
-```json
-{
-  "dry_run": true,
-  "option1": "value1",
-  "option2": "value2"
-}
-```
-
-See [PRODUCTS.md](PRODUCTS.md) for complete option specifications for each tool.
-
-## Finding Reports
-
-All tool reports are saved to:
-
-| Platform | Report Location |
-|----------|----------------|
-| Windows | `%USERPROFILE%\.rps\reports` |
-| macOS | `~/.rps/reports` |
-
-Reports are available in JSON, CSV, and HTML formats.
-
-## Next Steps
-
-- Read [USER_GUIDE.md](USER_GUIDE.md) for detailed tool documentation
-- Check [PRODUCTS.md](PRODUCTS.md) for complete specifications
-- See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) if you encounter issues
-
-## Getting Help
-
-- Email: contactmukundthiru@gmail.com
-- GitHub Issues: https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/issues
+See [USER_GUIDE.md](USER_GUIDE.md) for detailed tool documentation.

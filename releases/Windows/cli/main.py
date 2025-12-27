@@ -1,4 +1,5 @@
 import argparse
+import platform
 import subprocess
 import sys
 from pathlib import Path
@@ -13,6 +14,94 @@ from tools.utils import item_error, now_stamp
 from resolve.resolve_api import ResolveConnectionError
 
 SCRIPT_DIR = Path(__file__).parent.parent
+IS_WINDOWS = platform.system() == "Windows"
+IS_MACOS = platform.system() == "Darwin"
+IS_LINUX = platform.system() == "Linux"
+
+
+def create_desktop_shortcut() -> bool:
+    """Create desktop shortcut for the GUI application."""
+    desktop = Path.home() / "Desktop"
+    if not desktop.exists():
+        print(f"Desktop folder not found: {desktop}")
+        return False
+
+    install_dir = SCRIPT_DIR
+
+    if IS_WINDOWS:
+        try:
+            shortcut_path = desktop / "Resolve Production Suite.lnk"
+            target = install_dir / "resolve-suite-ui.bat"
+
+            if not target.exists():
+                print(f"UI launcher not found: {target}")
+                print("Please run the full installation first.")
+                return False
+
+            ps_cmd = f'''
+$ws = New-Object -ComObject WScript.Shell
+$s = $ws.CreateShortcut("{shortcut_path}")
+$s.TargetPath = "{target}"
+$s.WorkingDirectory = "{install_dir}"
+$s.Description = "Resolve Production Suite"
+$s.Save()
+'''
+            subprocess.run(["powershell", "-Command", ps_cmd], check=True, capture_output=True)
+            print(f"Created desktop shortcut: {shortcut_path}")
+            return True
+        except Exception as e:
+            print(f"Failed to create shortcut: {e}")
+            return False
+
+    elif IS_MACOS:
+        try:
+            shortcut_path = desktop / "Resolve Production Suite.command"
+            target = install_dir / "resolve-suite-ui"
+
+            if not target.exists():
+                print(f"UI launcher not found: {target}")
+                print("Please run the full installation first.")
+                return False
+
+            shortcut_path.write_text(f"""#!/bin/bash
+# Resolve Production Suite Launcher
+cd "{install_dir}"
+./resolve-suite-ui
+""")
+            shortcut_path.chmod(0o755)
+            print(f"Created desktop shortcut: {shortcut_path}")
+            return True
+        except Exception as e:
+            print(f"Failed to create shortcut: {e}")
+            return False
+
+    elif IS_LINUX:
+        try:
+            shortcut_path = desktop / "resolve-production-suite.desktop"
+            target = install_dir / "resolve-suite-ui"
+
+            if not target.exists():
+                print(f"UI launcher not found: {target}")
+                print("Please run the full installation first.")
+                return False
+
+            shortcut_path.write_text(f"""[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Resolve Production Suite
+Exec={install_dir}/resolve-suite-ui
+Terminal=false
+Categories=AudioVideo;Video;
+""")
+            shortcut_path.chmod(0o755)
+            print(f"Created desktop shortcut: {shortcut_path}")
+            return True
+        except Exception as e:
+            print(f"Failed to create shortcut: {e}")
+            return False
+
+    print("Unsupported platform for desktop shortcuts")
+    return False
 
 
 def _save_report(report: Report, output_dir: Path) -> None:
@@ -30,6 +119,7 @@ def main() -> None:
 
     sub.add_parser("list", help="List available tools")
     sub.add_parser("version", help="Show version")
+    sub.add_parser("shortcut", help="Create desktop shortcut for the GUI app")
     update_parser = sub.add_parser("update", help="Check for updates")
     update_parser.add_argument("--download", "-d", action="store_true", help="Open download page")
 
@@ -56,6 +146,13 @@ def main() -> None:
         version = version_file.read_text().strip() if version_file.exists() else "unknown"
         print(f"Resolve Production Suite v{version}")
         return
+
+    if args.command == "shortcut":
+        success = create_desktop_shortcut()
+        if success:
+            print("\nYou can now double-click the shortcut on your Desktop to launch the GUI.")
+            print("Remember: DaVinci Resolve must be running before using the tools!")
+        sys.exit(0 if success else 1)
 
     if args.command == "update":
         update_script = SCRIPT_DIR / "scripts" / "update_checker.py"

@@ -27,7 +27,7 @@ from pathlib import Path
 # Configuration
 # =============================================================================
 
-VERSION = "0.3.13"
+VERSION = "0.3.14"
 MIN_PYTHON = (3, 9)
 IS_WINDOWS = platform.system() == "Windows"
 IS_MACOS = platform.system() == "Darwin"
@@ -763,91 +763,136 @@ def ensure_desktop_shortcut(install_dir):
 def run_installation():
     """Run the installation process."""
     print_header()
-    print("INSTALLATION OPTIONS\n")
+    print("INSTALLATION\n")
 
-    install_dir = get_install_dir()
-    install_ui = prompt("\nInstall desktop UI (PySide6)?")
+    # Use default install directory (simpler)
+    install_dir = get_install_path()
+    print(f"  Install location: {install_dir}")
+    print(f"  Data directory:   {get_data_dir()}")
+    print()
 
-    # Detect Resolve
+    # Always install UI (most users want it)
+    install_ui = True
+    print_success("Will install Desktop UI (recommended)")
+
+    # Auto-detect Resolve
     resolve_path = detect_resolve()
     if resolve_path:
         print_success(f"Detected Resolve: {resolve_path}")
     else:
-        print_warning("DaVinci Resolve not detected")
-        custom = input("Enter Resolve scripting path (or press Enter to skip): ").strip()
-        if custom and Path(custom).exists():
-            resolve_path = custom
+        print_warning("DaVinci Resolve not detected (you can install Resolve later)")
 
-    # Confirm
-    print_header()
-    print("INSTALLATION SUMMARY\n")
-    print(f"  Install to:    {install_dir}")
-    print(f"  Data directory: {get_data_dir()}")
-    print(f"  Desktop UI:    {'Yes' if install_ui else 'No'}")
-    print(f"  Resolve path:  {resolve_path or 'Not configured'}")
     print()
-
-    if not prompt("Proceed with installation?"):
+    if not prompt("Ready to install?"):
         print("Installation cancelled.")
-        sys.exit(0)
+        wait_for_key()
+        return
 
-    # Install
+    # Install with progress tracking
     print_header()
     print("INSTALLING...\n")
+    print("This may take a few minutes. Please wait.\n")
+
+    steps_total = 6
+    step_num = 0
+
+    def progress(msg):
+        nonlocal step_num
+        step_num += 1
+        print(f"[{step_num}/{steps_total}] {msg}")
 
     try:
-        print_step("Copying files...")
-        copy_files(INSTALL_SOURCE, install_dir)
+        progress("Copying files...")
+        try:
+            copy_files(INSTALL_SOURCE, install_dir)
+        except PermissionError as e:
+            print_error("Permission denied while copying files.")
+            print("\nTry one of these:")
+            if IS_WINDOWS:
+                print("  1. Run the installer as Administrator")
+                print("  2. Close any programs using the install folder")
+            else:
+                print("  1. Check you have write permission to ~/.local/share/")
+                print("  2. Close any programs using the install folder")
+            wait_for_key()
+            return
+        except Exception as e:
+            print_error(f"Failed to copy files: {e}")
+            wait_for_key()
+            return
 
-        venv_dir = create_venv(install_dir)
-        install_dependencies(venv_dir, install_dir, install_ui)
+        progress("Creating virtual environment...")
+        try:
+            venv_dir = create_venv(install_dir)
+        except Exception as e:
+            print_error(f"Failed to create virtual environment: {e}")
+            print("\nMake sure you have Python 3.9+ with venv support:")
+            if IS_LINUX:
+                print("  sudo apt install python3-venv")
+            wait_for_key()
+            return
+
+        progress("Installing dependencies (this takes a while)...")
+        try:
+            install_dependencies(venv_dir, install_dir, install_ui)
+        except subprocess.CalledProcessError as e:
+            print_error("Failed to install dependencies.")
+            print("\nPossible solutions:")
+            print("  1. Check your internet connection")
+            print("  2. Try running the installer again")
+            if IS_LINUX:
+                print("  3. Install pip: sudo apt install python3-pip")
+            wait_for_key()
+            return
+        except Exception as e:
+            print_error(f"Dependency installation error: {e}")
+            wait_for_key()
+            return
+
+        progress("Setting up data directories...")
         create_data_dirs()
 
-        print_step("Creating launcher scripts...")
+        progress("Creating launcher scripts...")
         create_launchers(install_dir, venv_dir, resolve_path)
 
-        add_to_path(install_dir)
-        create_desktop_shortcut(install_dir)
+        progress("Creating desktop shortcut...")
+        create_desktop_shortcut_impl(install_dir, silent=False)
 
         # Success
-        print_header()
-        print("=" * 50)
+        print()
+        print("=" * 55)
         print(f"{Colors.GREEN}  INSTALLATION COMPLETE!{Colors.END}")
-        print("=" * 50)
+        print("=" * 55)
         print()
-        print("  You're all set! Here's how to get started:")
+        print(f"  {Colors.CYAN}GET STARTED:{Colors.END}")
         print()
-        if install_ui:
-            print(f"  {Colors.CYAN}EASIEST WAY:{Colors.END}")
-            print("    Double-click the 'Resolve Production Suite' shortcut on your Desktop")
-            print()
-        print(f"  {Colors.CYAN}COMMAND LINE:{Colors.END}")
-        if IS_WINDOWS:
-            print(f"    1. Open Command Prompt or PowerShell")
-            print(f"    2. cd {install_dir}")
-            print(f"    3. resolve-suite.bat list")
-        else:
-            print(f"    1. Open Terminal")
-            print(f"    2. cd {install_dir}")
-            print(f"    3. ./resolve-suite list")
+        print("    1. Open DaVinci Resolve")
+        print("    2. Double-click 'Resolve Production Suite' on your Desktop")
+        print("    3. Click 'Connect' to connect to Resolve")
+        print("    4. Select a tool and run it!")
         print()
-        print(f"  {Colors.CYAN}THE 10 TOOLS:{Colors.END}")
-        print("    1. Revision Resolver      6. Timeline Normalizer")
-        print("    2. Relink Across Projects 7. Component Graphics")
-        print("    3. Smart Reframer         8. Delivery Spec Enforcer")
-        print("    4. Caption Layout         9. Change Impact Analyzer")
-        print("    5. Feedback Compiler     10. Brand Drift Detector")
+        print(f"  {Colors.CYAN}SHORTCUT MISSING?{Colors.END}")
+        print("    Run this installer again and choose 'Create Desktop Shortcut'")
         print()
-        print(f"  Documentation: {install_dir / 'docs'}")
-        print(f"  Reports saved to: {get_data_dir() / 'reports'}")
+        print(f"  {Colors.CYAN}DOCUMENTATION:{Colors.END}")
+        print(f"    {install_dir / 'docs'}")
         print()
 
+    except KeyboardInterrupt:
+        print("\n\nInstallation cancelled.")
+        return
     except Exception as e:
-        print_error(f"Installation failed: {e}")
+        print()
+        print_error(f"Installation failed unexpectedly: {e}")
+        print()
+        print("Please report this error at:")
+        print("  https://github.com/contactmukundthiru-cyber/davinci-suite-scripts/issues")
+        print()
+        print("Include the error message above when reporting.")
         import traceback
         traceback.print_exc()
         wait_for_key()
-        sys.exit(1)
+        return
 
     wait_for_key()
 
@@ -959,6 +1004,48 @@ def is_installed():
     return install_dir.exists()
 
 
+def get_install_path():
+    """Get the default installation path."""
+    if IS_WINDOWS:
+        return Path(os.environ.get("LOCALAPPDATA", Path.home())) / "ResolveProductionSuite"
+    else:
+        return Path.home() / ".local" / "share" / "resolve-production-suite"
+
+
+def run_create_shortcut():
+    """Create desktop shortcut as a standalone action."""
+    print_header()
+    print("CREATE DESKTOP SHORTCUT\n")
+
+    install_dir = get_install_path()
+
+    if not install_dir.exists():
+        print_error("Resolve Production Suite is not installed.")
+        print(f"  Expected location: {install_dir}")
+        print("\nPlease install first, then create a shortcut.")
+        wait_for_key()
+        return
+
+    print(f"Installation found: {install_dir}")
+    print()
+
+    if create_desktop_shortcut_impl(install_dir, silent=False):
+        print()
+        print(f"{Colors.GREEN}Desktop shortcut created successfully!{Colors.END}")
+        print("\nYou can now double-click the shortcut on your Desktop")
+        print("to launch Resolve Production Suite.")
+    else:
+        print()
+        print_error("Failed to create desktop shortcut.")
+        print("\nYou can manually create a shortcut to:")
+        if IS_WINDOWS:
+            print(f"  {install_dir / 'resolve-suite-ui.bat'}")
+        else:
+            print(f"  {install_dir / 'resolve-suite-ui'}")
+
+    wait_for_key()
+
+
 def main():
     """Main entry point with menu."""
     print_header()
@@ -967,6 +1054,15 @@ def main():
     if sys.version_info < MIN_PYTHON:
         print_error(f"Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]}+ required.")
         print_error(f"You have Python {sys.version_info.major}.{sys.version_info.minor}")
+        print()
+        print("Please install Python 3.9 or newer:")
+        if IS_WINDOWS:
+            print("  https://www.python.org/downloads/windows/")
+        elif IS_MACOS:
+            print("  https://www.python.org/downloads/macos/")
+        else:
+            print("  sudo apt install python3.9  (Ubuntu/Debian)")
+            print("  sudo dnf install python39   (Fedora)")
         wait_for_key()
         sys.exit(1)
 
@@ -991,17 +1087,19 @@ def main():
         if already_installed:
             print("  1. Reinstall / Repair")
             print("  2. Check for Updates")
-            print("  3. Uninstall")
-            print("  4. Exit")
+            print("  3. Create Desktop Shortcut")
+            print("  4. Uninstall")
+            print("  5. Exit")
         else:
             print("  1. Install (First Time Setup)")
             print("  2. Check for Updates")
-            print("  3. Uninstall")
-            print("  4. Exit")
+            print("  3. Create Desktop Shortcut")
+            print("  4. Uninstall")
+            print("  5. Exit")
         print()
 
         try:
-            choice = input("Enter choice (1-4): ").strip()
+            choice = input("Enter choice (1-5): ").strip()
 
             if choice == "1":
                 run_installation()
@@ -1009,13 +1107,15 @@ def main():
             elif choice == "2":
                 run_updater()
             elif choice == "3":
+                run_create_shortcut()
+            elif choice == "4":
                 run_uninstall()
                 break
-            elif choice == "4":
+            elif choice == "5":
                 print("\nGoodbye!")
                 sys.exit(0)
             else:
-                print("Invalid choice. Please enter 1, 2, 3, or 4.")
+                print("Invalid choice. Please enter 1, 2, 3, 4, or 5.")
         except KeyboardInterrupt:
             print("\n\nGoodbye!")
             sys.exit(0)

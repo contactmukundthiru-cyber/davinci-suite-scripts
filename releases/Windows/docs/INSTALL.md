@@ -1,158 +1,83 @@
 # Installation Guide
 
-## Quick Installation (Recommended)
+## Quick Installation
 
 ### Windows
 
 1. Download `ResolveProductionSuite-Windows.zip`
-2. Extract the folder to a location of your choice
-3. Open the extracted folder
-4. Double-click `CLICK_ME_FIRST.bat`
-5. Select option 1 (Install)
-6. Follow the on-screen prompts
-
-The installer will:
-- Automatically download and install Python if needed
-- Install all required dependencies
-- Create a desktop shortcut
-- Add the tools to your system PATH
+2. Extract the folder
+3. Double-click `CLICK_ME_FIRST.bat`
+4. Select "Install" from the menu
+5. Done! A desktop shortcut is created.
 
 ### macOS
 
 1. Download `ResolveProductionSuite-macOS.zip`
-2. Extract the folder to a location of your choice
-3. Open the extracted folder
-4. Double-click `DOUBLE_CLICK_ME.command`
-5. If you see "unidentified developer" warning, right-click > Open > Open
-6. Select option 1 (Install)
-7. Follow the on-screen prompts
+2. Extract the folder
+3. Double-click `DOUBLE_CLICK_ME.command`
+4. If you see "unidentified developer": Right-click > Open > Open
+5. Select "Install" from the menu
+6. Done! A desktop shortcut is created.
 
-The installer will:
-- Use Homebrew Python if available, otherwise download from python.org
-- Install all required dependencies
-- Create a desktop alias
-- Add the tools to your system PATH
+## Using the Tools
 
-## Enabling DaVinci Resolve Scripting
+1. **Open DaVinci Resolve first** (must be running!)
+2. Double-click the desktop shortcut
+3. Click "Connect Resolve"
+4. Select your project and timeline
+5. Choose a tool and click "Run Tool"
 
-For the tools to communicate with DaVinci Resolve, you need to enable scripting:
-
-### Windows
-
-The Resolve scripting modules are typically located at:
-```
-C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting\Modules
-```
-
-Set the environment variable (optional, installer may handle this):
-1. Open System Properties > Environment Variables
-2. Add new system variable:
-   - Name: `RESOLVE_SCRIPT_API`
-   - Value: `C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting\Modules`
-
-### macOS
-
-The Resolve scripting modules are typically located at:
-```
-/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting/Modules
-```
-
-Add to your shell profile (~/.zshrc or ~/.bash_profile):
-```bash
-export RESOLVE_SCRIPT_API="/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting/Modules"
-```
+The app **auto-detects Resolve** - no configuration needed.
 
 ## Updating
 
-To update to the latest version:
-
 1. Run the installer (CLICK_ME_FIRST.bat or DOUBLE_CLICK_ME.command)
-2. Select option 2 (Check for Updates)
-3. The update will be downloaded and applied automatically
-
-You don't need to re-download the zip file - the updater handles everything.
+2. Select "Check for Updates"
+3. Updates download and apply automatically
 
 ## Uninstalling
 
-To remove the suite:
-
 1. Run the installer
-2. Select option 3 (Uninstall)
+2. Select "Uninstall"
 3. Choose whether to keep or remove user data
 
-This will:
-- Remove the installed program files
-- Remove desktop shortcuts
-- Remove PATH entries
-- Optionally remove user data and settings
+## Desktop Shortcut Missing?
 
-## Installation Locations
+Recreate it with:
 
-| Platform | Default Install Location |
-|----------|-------------------------|
-| Windows | `%LOCALAPPDATA%\ResolveProductionSuite` |
-| macOS | `~/Library/Application Support/ResolveProductionSuite` |
+```bash
+# Windows (in Command Prompt)
+resolve-suite.bat shortcut
 
-User data (presets, logs, reports) is stored separately:
+# macOS (in Terminal)
+./resolve-suite shortcut
+```
 
-| Platform | User Data Location |
-|----------|-------------------|
-| Windows | `%USERPROFILE%\.rps` |
-| macOS | `~/.rps` |
+## File Locations
 
-## Environment Variables
-
-| Variable | Purpose |
-|----------|---------|
-| `RESOLVE_SCRIPT_API` | Path to Resolve scripting modules |
-| `RPS_HOME` | Suite data home (default: `~/.rps`) |
-| `RPS_LOGS` | Custom log path |
-| `RPS_REPORTS` | Custom report path |
-| `RPS_PRESETS` | Custom presets path |
+| What | Windows | macOS |
+|------|---------|-------|
+| Program | `%LOCALAPPDATA%\ResolveProductionSuite` | `~/.local/share/resolve-production-suite` |
+| Reports | `%USERPROFILE%\.rps\reports` | `~/.rps/reports` |
+| Presets | `%USERPROFILE%\.rps\presets` | `~/.rps/presets` |
 
 ## Troubleshooting
 
-### Windows
+**"Resolve not connected"**
+→ Make sure DaVinci Resolve is running first
 
-**"Windows protected your PC" warning**
-- Click "More info" then "Run anyway"
+**"Windows protected your PC"**
+→ Click "More info" then "Run anyway"
+
+**"unidentified developer" (macOS)**
+→ Right-click > Open > Open
 
 **Nothing happens when double-clicking**
-- Right-click the file and select "Run as administrator"
-
-**Python not found after installation**
-- Close the window and run CLICK_ME_FIRST.bat again
-
-### macOS
-
-**"unidentified developer" warning**
-- Right-click > Open > Open
-- Or: System Preferences > Security & Privacy > Open Anyway
-
-**"permission denied" error**
-- Open Terminal and run: `chmod +x DOUBLE_CLICK_ME.command`
-
-### General
-
-**Resolve connection fails**
-- Make sure DaVinci Resolve is running
-- Verify scripting is enabled in Resolve preferences
-- Check that `RESOLVE_SCRIPT_API` points to the correct location
+→ Right-click > "Run as administrator"
 
 ## System Requirements
 
-| Component | Requirement |
-|-----------|-------------|
-| OS | Windows 10/11 or macOS 10.15+ |
-| Python | 3.9+ (auto-installed by installer) |
-| DaVinci Resolve | Studio or Free with scripting enabled |
-| RAM | 8GB minimum, 16GB recommended |
-| Disk | 500MB for installation |
-
-## Resolve Free vs Studio
-
-The tools work with both Resolve Free and Studio. However, some optional features require Studio:
-- Face detection in Smart Reframer (requires Studio's Neural Engine access)
-- Certain codec settings in Delivery Spec Enforcer
-
-All core functionality works with Resolve Free.
+- Windows 10/11 or macOS 10.15+
+- DaVinci Resolve (Free or Studio)
+- Python 3.9+ (auto-installed)
+- 8GB RAM, 500MB disk space

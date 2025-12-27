@@ -1,10 +1,14 @@
 import os
+import platform
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 APP_NAME = "resolve_production_suite"
 ENV_PREFIX = "RPS"
+IS_WINDOWS = platform.system() == "Windows"
+IS_MACOS = platform.system() == "Darwin"
+IS_LINUX = platform.system() == "Linux"
 
 
 def _xdg_path(env_var: str, default: str) -> Path:
@@ -12,6 +16,31 @@ def _xdg_path(env_var: str, default: str) -> Path:
     if value:
         return Path(value)
     return Path(default).expanduser()
+
+
+def _auto_detect_resolve_api() -> Optional[Path]:
+    """Auto-detect DaVinci Resolve scripting API path."""
+    paths = []
+
+    if IS_WINDOWS:
+        paths = [
+            Path(r"C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting\Modules"),
+            Path(r"C:\Program Files\Blackmagic Design\DaVinci Resolve\Developer\Scripting\Modules"),
+        ]
+    elif IS_MACOS:
+        paths = [
+            Path("/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting/Modules"),
+        ]
+    elif IS_LINUX:
+        paths = [
+            Path("/opt/resolve/Developer/Scripting/Modules"),
+            Path("/opt/blackmagic/DaVinci Resolve/Developer/Scripting/Modules"),
+        ]
+
+    for p in paths:
+        if p.exists():
+            return p
+    return None
 
 
 @dataclass
@@ -32,9 +61,13 @@ class Config:
     dry_run: bool = False
 
     def __post_init__(self) -> None:
+        # First check environment variable
         env_script_api = os.environ.get("RESOLVE_SCRIPT_API")
         if env_script_api:
             self.resolve_script_api = Path(env_script_api)
+        else:
+            # Auto-detect Resolve API path
+            self.resolve_script_api = _auto_detect_resolve_api()
 
 
 _default_config: Optional[Config] = None
