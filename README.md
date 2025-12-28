@@ -1,24 +1,20 @@
 # Resolve Production Suite
 
-Professional workflow automation tools for DaVinci Resolve Studio/Free. This suite focuses on revision speed, consistency, and deliverable correctness for high-volume agencies and editors.
-
-**Current Version:** 0.3.3
+Professional workflow automation tools for DaVinci Resolve. 10 tools designed for revision speed, consistency, and deliverable correctness.
 
 ## Quick Start
 
-### Windows
-1. Download `ResolveProductionSuite-Windows.zip`
-2. Extract the folder
-3. Double-click `CLICK_ME_FIRST.bat`
-4. Follow the on-screen menu
+**Windows:**
+1. Download and extract `ResolveProductionSuite-Windows.zip`
+2. Double-click `CLICK_ME_FIRST.bat`
+3. Select "Install" from the menu
 
-### macOS
-1. Download `ResolveProductionSuite-macOS.zip`
-2. Extract the folder
-3. Double-click `DOUBLE_CLICK_ME.command`
-4. Follow the on-screen menu
+**macOS:**
+1. Download and extract `ResolveProductionSuite-macOS.zip`
+2. Double-click `DOUBLE_CLICK_ME.command`
+3. Select "Install" from the menu
 
-The installer will automatically download Python if needed and set everything up for you.
+After installation, open DaVinci Resolve, then launch "Resolve Production Suite" from your Desktop.
 
 ## What's Included
 
